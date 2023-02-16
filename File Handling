@@ -1,34 +1,53 @@
 import os
 
-DB_FILENAME = 'names.txt'
 
-# check if DB file exists, create it if it doesn't
-if not os.path.exists(DB_FILENAME):
-    with open(DB_FILENAME, 'w') as f:
-        f.write('')  # write an empty string to create the file
+db_file_name = "names_database.txt"
 
-# load names from DB file into a dictionary
-with open(DB_FILENAME, 'r') as f:
-    names = {name.strip(): True for name in f if name.strip()}
 
-# define search and add functions
+if not os.path.isfile(db_file_name):
+    with open(db_file_name, "w") as db_file:
+        db_file.write("")
+
+
+with open(db_file_name, "r") as db_file:
+    names_dict = {}
+    for line in db_file:
+        name = line.strip()
+        names_dict[name] = True
+
+
 def search(name):
-    return name in names
+    if name in names_dict:
+        print(f"{name} is in the database")
+    else:
+        print(f"{name} is not in the database")
+
 
 def add(name):
-    if name not in names:
-        names[name] = True
-        return True  # name was added successfully
-    else:
-        return False  # name already exists in database
+    names_dict[name] = True
+    save()
 
-# define save function to overwrite DB file with current names
+
 def save():
-    with open(DB_FILENAME, 'w') as f:
-        f.write('\n'.join(names.keys()))
+    with open(db_file_name, "w") as db_file:
+        for name in names_dict:
+            db_file.write(f"{name}\n")
+    print("Names saved to database file")
 
-# example usage
-print(search('Alice'))  # prints False
-print(add('Alice'))  # prints True
-print(search('Alice'))  # prints True
-save()  # saves the current names to the DB file
+def display():
+    print("Names in database:")
+    for name in names_dict:
+        print(name)
+
+while True:
+    print('Options \n1.Search\n2.Add\n3.Save\n4.Display')
+    choice = int(input('Choose: '))
+    if choice == 1:
+        search(input('Search: '))
+    if choice == 2:
+        add(input("Add: "))
+    if choice == 3:
+        save()
+        break
+    if choice == 4:
+        display()
